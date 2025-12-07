@@ -1,0 +1,36 @@
+import json
+import matplotlib.pyplot as plt
+from collections import Counter
+
+
+with open("trains.json", "r", encoding="utf-8") as f:
+    trains = json.load(f)
+
+
+destinations = []
+for t in trains:
+    
+    parts = t["route"].split("–")
+    dest = parts[1].strip()  
+    destinations.append(dest)
+
+
+counts = Counter(destinations)
+
+labels = list(counts.keys())
+values = list(counts.values())
+
+
+plt.figure(figsize=(7, 7))
+
+plt.pie(
+    values,
+    labels=labels,           
+    autopct="%.1f%%",        
+    startangle=90,           
+    explode=[0.05] * len(values)  
+)
+
+plt.title("Частка поїздів за містом призначення")
+plt.axis("equal")            
+plt.show()
