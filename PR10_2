@@ -1,0 +1,75 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+file = "Lab10_2.csv"
+df = pd.read_csv(file)
+
+indicator = "SE.PRM.UNER"
+df = df[df["Series Code"] == indicator]
+
+ukraine = df[df["Country Name"] == "Ukraine"]
+ireland = df[df["Country Name"] == "Ireland"]
+
+years = list(range(2003, 2023))
+year_cols = [f"{y} [YR{y}]" for y in years]
+
+ukraine_series = pd.to_numeric(ukraine[year_cols].iloc[0], errors="coerce")
+ireland_series = pd.to_numeric(ireland[year_cols].iloc[0], errors="coerce")
+
+ukraine_vals = ukraine_series.to_numpy(dtype=float)
+ireland_vals = ireland_series.to_numpy(dtype=float)
+
+years_arr = np.array(years)
+
+plt.figure(figsize=(10, 6))
+
+
+mask_ukr = ~np.isnan(ukraine_vals)
+mask_irl = ~np.isnan(ireland_vals)
+
+plt.plot(
+    years_arr[mask_ukr], ukraine_vals[mask_ukr],
+    marker='o', linewidth=2, label="Україна", color='blue'
+)
+plt.plot(
+    years_arr[mask_irl], ireland_vals[mask_irl],
+    marker='s', linewidth=2, label="Ірландія", color='red'
+)
+
+plt.title("Children out of school, primary (SE.PRM.UNER)\nУкраїна vs Ірландія")
+plt.xlabel("Рік")
+plt.ylabel("Кількість дітей поза школою")
+plt.grid(True, linestyle='--', alpha=0.5)
+plt.xticks(years_arr, rotation=45)
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+countries = {
+    "ukraine": ukraine_vals,
+    "україна": ukraine_vals,
+    "ireland": ireland_vals,
+    "ірландія": ireland_vals
+}
+
+country_input = input(
+    "Введіть країну (Ukraine / Ireland / Україна / Ірландія): "
+).strip().lower()
+
+if country_input not in countries:
+    print("Невірно введена країна.")
+else:
+    vals = countries[country_input]
+    mask = ~np.isnan(vals)
+
+    plt.figure(figsize=(10, 6))
+    plt.bar(years_arr[mask], vals[mask])
+
+    plt.title(f"Children out of school, primary\n{country_input.capitalize()}")
+    plt.xlabel("Рік")
+    plt.ylabel("Кількість дітей поза школою")
+    plt.xticks(years_arr[mask], rotation=45)
+    plt.grid(axis='y', linestyle='--', alpha=0.5)
+    plt.tight_layout()
+    plt.show()
